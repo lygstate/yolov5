@@ -1,0 +1,13 @@
+conda activate test-env
+
+set http_proxy=http://127.0.0.1:57073
+set https_proxy=http://127.0.0.1:57073
+
+conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c conda-forge
+
+pip install --proxy http://127.0.0.1:57073 -r requirements.txt
+
+conda env list
+
+conda activate test-env
+python detect.py
