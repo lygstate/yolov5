@@ -1,6 +1,7 @@
 import argparse
 import os
 
+import json
 import cv2
 import torch
 from numpy import random
@@ -71,35 +72,35 @@ def detect():
                         'x1': int(xyxy[2]),
                         'y1': int(xyxy[3]),
                         'conf': conf,
+                        'label': names[cls],
                         'cls': cls
                     })
         print('\n')
         for item in items:
             cls = item['cls']
             conf = item['conf']
-            if cls <= 35:
-                continue
-            if conf < 0.5:
-                continue
-            label = f'{names[int(cls)]} {conf:.2f}'
-            color=colors[int(cls)]
+            label = item['label']
+            color=colors[cls]
             xyxy = [item['x0'], item['y0'], item['x1'], item['y1']]
-            cropped_image = im0[item['y0']:item['y1'], item['x0']:item['x1']]
-            crop_p = f"{out}/{pic_index}_{item['x0']}_{item['y0']}_{item['x1']}_{item['y1']}_{cls}.bmp"
-            # cv2.imshow(crop_p, cropped_image)
-            cv2.imwrite(crop_p, cropped_image)
-            # cv2.waitKey()
-
-            #plot_one_box(xyxy, im0, label=label, color=color, line_thickness=1)
-
+            if cls > 35 and conf > 0.6:
+                cropped_image = im0[item['y0']-2:item['y1']+2, item['x0']-2:item['x1']+2]
+                crop_p = f"{out}/{pic_index}_{item['x0']}_{item['y0']}_{item['x1']}_{item['y1']}_{cls}_{label}.bmp"
+                cv2.imwrite(crop_p, cropped_image)
+            # plot_one_box(xyxy, im0, label=label, color=color, line_thickness=1)
         four_pic.append(items)
         pic_index +=1
+        # cv2.imshow(p, im0)
+
+    with open(f'{out}/detected.json', 'w') as f:
+        json.dump(four_pic, f, indent=2)
+    cv2.waitKey()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    data_name = 'VID_20210712_094329'
     parser.add_argument('--weights', nargs='+', type=str, default='work_dirs/1280_bs32/weights/best.pt', help='model.pt path(s)')
-    parser.add_argument('--output', type=str, default='./output-data', help='output folder')
-    parser.add_argument('--source', type=str, default='./source-data/VID_20210712_094216', help='source')  # file/folder, 0 for webcam
+    parser.add_argument('--output', type=str, default=f'./output-data/{data_name}', help='output folder')
+    parser.add_argument('--source', type=str, default=f'./source-data/{data_name}', help='source')  # file/folder, 0 for webcam
     parser.add_argument('--img-size', type=int, default=1920, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.2, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
