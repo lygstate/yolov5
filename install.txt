@@ -4,10 +4,24 @@ set http_proxy=http://127.0.0.1:57073
 set https_proxy=http://127.0.0.1:57073
 
 conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c conda-forge
-
 pip install --proxy http://127.0.0.1:57073 -r requirements.txt
+
+python -m pip install paddlepaddle==2.0.0 -i https://mirror.baidu.com/pypi/simple
+python -m pip install paddlepaddle-gpu==2.1.0 -i https://mirror.baidu.com/pypi/simple
+python -m pip install scikit-image imgaug
+python -m pip uninstall scikit-image imgaug
+python -m pip uninstall paddleocr
+
+python -m pip uninstall shapely
+python -m pip install shapely
+python -m pip install Shapely-1.7.1-cp39-cp39-win_amd64.whl
+
+conda install paddle
 
 conda env list
 
 conda activate test-env
 python detect.py
+
+# 使用方向分类器
+python tools/infer/predict_system.py --image_dir="./doc/imgs/00018069.jpg" --det_model_dir="./inference/ch_ppocr_server_v2.0_det_infer" --cls_model_dir="./inference/ch_ppocr_mobile_v2.0_cls_infer" --rec_model_dir="./inference/ch_ppocr_server_v2.0_rec_infer" --use_angle_cls=true
