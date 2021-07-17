@@ -1,11 +1,14 @@
-conda env create test-env
+conda create -y --name test-env
 conda activate test-env
 
 set http_proxy=http://127.0.0.1:57073
 set https_proxy=http://127.0.0.1:57073
 
 conda install pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c conda-forge
-pip install --proxy http://127.0.0.1:57073 -r requirements.txt
+pip install pip -U
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+pip install -r requirements.txt
 
 python -m pip install paddlepaddle==2.0.0 -i https://mirror.baidu.com/pypi/simple
 python -m pip install paddlepaddle-gpu==2.1.0 -i https://mirror.baidu.com/pypi/simple
