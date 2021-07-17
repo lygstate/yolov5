@@ -1,3 +1,4 @@
+conda env create test-env
 conda activate test-env
 
 set http_proxy=http://127.0.0.1:57073
