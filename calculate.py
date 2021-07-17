@@ -40,7 +40,7 @@ class Detector(object):
         print("Init finished")
 
     def loadImage(self, buf):
-        nparr = np.fromstring(buf, np.uint8)
+        nparr = np.frombuffer(buf, np.uint8)
         img0 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Padded resize
