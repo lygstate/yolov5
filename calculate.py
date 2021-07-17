@@ -13,9 +13,8 @@ from utils.datasets import LoadImages, letterbox
 from utils.general import check_img_size, non_max_suppression, scale_coords, set_logging
 from utils.torch_utils import select_device
 
-class Resquest(BaseHTTPRequestHandler):
-    def __init__(self, request: bytes, client_address: Tuple[str, int], server: socketserver.BaseServer) -> None:
-        super().__init__(request, client_address, server)
+class Detector(object):
+    def __init__(self, opt):
         # Initialize
         set_logging()
         device = select_device(opt.device)
@@ -36,15 +35,7 @@ class Resquest(BaseHTTPRequestHandler):
         self.half = half
         self.names = names
         self.colors = colors
-
-    def do_POST(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        content_len = int(self.headers.get('Content-Length'))
-        post_body = self.rfile.read(content_len)
-        items = self.detect(post_body)
-        self.wfile.write(json.dumps(items).encode())
+        print("Init finished")
 
     def loadImage(self, buf):
         img0 = cv2.imdecode(buf)
@@ -100,8 +91,21 @@ class Resquest(BaseHTTPRequestHandler):
                     })
         return items
 
-host = ('localhost', 8888)
+class Resquest(BaseHTTPRequestHandler):
+    def __init__(self, request: bytes, client_address: Tuple[str, int], server: socketserver.BaseServer) -> None:
+        super().__init__(request, client_address, server)
 
+    def do_POST(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        content_len = int(self.headers.get('Content-Length'))
+        post_body = self.rfile.read(content_len)
+        items = detector.detect(post_body)
+        self.wfile.write(json.dumps(items).encode())
+
+host = ('localhost', 8888)
+detector = None
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     data_name = 'VID_20210717_real'
@@ -124,6 +128,7 @@ if __name__ == '__main__':
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     opt = parser.parse_args()
     print(opt)
+    detector = Detector(opt)
 
     server = HTTPServer(host, Resquest)
     print("Starting server, listen at: %s:%s" % host)
