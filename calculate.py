@@ -104,7 +104,7 @@ class Resquest(BaseHTTPRequestHandler):
         items = detector.detect(post_body)
         self.wfile.write(json.dumps(items).encode())
 
-host = ('localhost', 8888)
+host = ('0.0.0.0', 8888)
 detector = None
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
