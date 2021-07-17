@@ -28,7 +28,9 @@ class Detector(object):
         # Get names and colors
         names = model.module.names if hasattr(model, 'module') else model.names
         colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
-
+        # Run inference
+        img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
+        _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once    
         self.imgsz = imgsz
         self.model = model
         self.device = device
@@ -38,7 +40,8 @@ class Detector(object):
         print("Init finished")
 
     def loadImage(self, buf):
-        img0 = cv2.imdecode(buf)
+        nparr = np.fromstring(buf, np.uint8)
+        img0 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Padded resize
         img = letterbox(img0, new_shape=self.imgsz)[0]
@@ -49,16 +52,12 @@ class Detector(object):
         return img, img0
 
     def detect(self, buf):
-        img, img0 = self.loadImage(buf)
-        print(f'Handing {img0.shape}')
         device = self.device
         half = self.half
         model = self.model
-        imgsz = self.imgsz
 
-        img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
-        _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once
-
+        img, img0 = self.loadImage(buf)
+        print(f'Handing {img0.shape}')
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -96,12 +95,13 @@ class Resquest(BaseHTTPRequestHandler):
         super().__init__(request, client_address, server)
 
     def do_POST(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
         content_len = int(self.headers.get('Content-Length'))
         post_body = self.rfile.read(content_len)
         items = detector.detect(post_body)
+
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
         self.wfile.write(json.dumps(items).encode())
 
 host = ('0.0.0.0', 8888)
