@@ -1,0 +1,13 @@
+{
+  "terminal.explorerKind": "integrated",
+  "terminal.integrated.allowChords": true,
+  "terminal.integrated.profiles.windows": {
+    "pytorch": {
+      "path": "${env:windir}\\System32\\cmd.exe",
+      "overrideName": true,
+      "args": ["/K", "C:/ProgramData/Anaconda3/Scripts/activate.bat"]
+    }
+  },
+  "python.terminal.activateEnvironment": false,
+  "python.formatting.provider": "yapf"
+}
