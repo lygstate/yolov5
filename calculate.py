@@ -9,7 +9,7 @@ import torch
 import numpy as np
 from numpy import random
 from models.experimental import attempt_load
-from utils.datasets import LoadImages, letterbox
+from utils.datasets import letterbox
 from utils.general import check_img_size, non_max_suppression, scale_coords, set_logging
 from utils.torch_utils import select_device
 
