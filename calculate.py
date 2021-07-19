@@ -57,7 +57,7 @@ class Detector(object):
         model = self.model
 
         img, img0 = self.loadImage(buf)
-        print(f'Handing {img0.shape}')
+        # print(f'Handing {img0.shape}')
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
