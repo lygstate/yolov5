@@ -19,7 +19,7 @@
 *.avi
 *.data
 *.json
-
+drone-models
 *.cfg
 !cfg/yolov3*.cfg
 
