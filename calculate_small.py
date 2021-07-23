@@ -104,15 +104,15 @@ class Resquest(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(items).encode())
 
-host = ('0.0.0.0', 8888)
+host = ('0.0.0.0', 8887)
 detector = None
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     data_name = 'VID_20210717_real'
-    parser.add_argument('--weights', nargs='+', type=str, default='drone-models/detection/best.pt', help='model.pt path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='drone-models/detection-small/best-small.pt', help='model.pt path(s)')
     parser.add_argument('--output', type=str, default=f'./output-data/{data_name}', help='output folder')
     parser.add_argument('--source', type=str, default=f'./source-data/{data_name}', help='source')  # file/folder, 0 for webcam
-    parser.add_argument('--img-size', type=int, default=1920, help='inference size (pixels)')
+    parser.add_argument('--img-size', type=int, default=224, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.2, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
